@@ -71,6 +71,7 @@ const Dashboard = () => {
   }, [data]);
 
   const AppliedLeave = useEmployeeAppliedLeavesQuery({
+    // ids: EmployeeId?.userProfile?.userId || null,
     accessToken: accessToken,
   });
 
@@ -92,6 +93,7 @@ const Dashboard = () => {
       dispatch(applied(AppliedLeave?.data?.data));
     }
   }, [AppliedLeave]);
+  console.log(JSON.stringify(AppliedLeave));
   
 
   useEffect(() => {

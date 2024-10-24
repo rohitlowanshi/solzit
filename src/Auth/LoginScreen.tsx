@@ -4,30 +4,23 @@ import {useDispatch, useSelector} from 'react-redux';
 import {Colors} from '../constants/Colors';
 import CustomTextInput from '../Components/CustomTextInput';
 import {SCREEN_WIDTH} from '../constants/Screen';
-import {ActivityIndicator, Checkbox} from 'react-native-paper';
+import {ActivityIndicator} from 'react-native-paper';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
-import {auth, credential, isDarkTheme} from '../AppStore/Reducers/appState';
+import {auth, isDarkTheme} from '../AppStore/Reducers/appState';
 import Placeholder from '../Screens/Placeholder/Placeholder';
-import {
-  useForgotPasswordQuery,
-  useUserAuthenticationloginMutation,
-} from '../Services/appLevel';
+import { useForgotPasswordQuery, useUserAuthenticationloginMutation} from '../Services/appLevel';
 
 const LoginScreen = ({navigation}: any) => {
   const dispatch = useDispatch();
   const isDark = useSelector(isDarkTheme);
 
-  const authCredential = useSelector(
-    (state: any) => state?.appState?.authCredential,
-  );
-
   const [showPassword, setShowPassword] = useState(true);
-  const [iscredential, setIsCredential] = useState(false);
   const [showForgot, SetShowForgot] = useState(false);
-
   const [userAuthenticationlogin, {isLoading, error}] =
     useUserAuthenticationloginMutation();
+   
+    
 
   const validationSchema = Yup.object().shape({
     username: Yup.string()
@@ -37,22 +30,16 @@ const LoginScreen = ({navigation}: any) => {
   });
 
   const handleLogin = async (values: {username: string; password: string}) => {
-    const email = values.username;
-    const password = values.password;
-
     try {
       const response = await userAuthenticationlogin({
-        email: email,
-        password: password,
+        email: values.username,
+        password: values.password,
       });
 
       if (response && response?.data?.messageDetail?.message_code === 200) {
+     
+        
         dispatch(auth(response?.data?.data));
-        if (iscredential) {
-          dispatch(credential({username: email, password: password}));
-        } else {
-          dispatch(credential({username: '', password: ''}));
-        }
         navigation.navigate('CheckStack');
       } else {
         Alert.alert(
@@ -76,14 +63,16 @@ const LoginScreen = ({navigation}: any) => {
     setEmail(values?.username || null);
     try {
       const response = await forget;
-
-      if (response.status === 'fulfilled') {
+      
+      if(response.status === 'fulfilled' ){
         Alert.alert('Success', response?.data?.messageDetail?.message);
-      } else if (response.status === 'rejected') {
-        Alert.alert('Success', 'Username/email must not be empty');
+      }
+      else if (response.status === 'rejected'){
+        Alert.alert('Success','Username/email must not be empty');
       }
     } catch (err) {
-      console.warn(err);
+    console.warn(err);
+    
     }
   };
 
@@ -100,8 +89,8 @@ const LoginScreen = ({navigation}: any) => {
       ) : (
         <Formik
           initialValues={{
-            username: authCredential?.username || '',
-            password: authCredential?.password || '',
+            username: '',
+            password: '',
           }}
           validationSchema={validationSchema}
           onSubmit={handleLogin}>
@@ -177,49 +166,16 @@ const LoginScreen = ({navigation}: any) => {
                   {errors.password}
                 </Text>
               )}
-
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginVertical: 16,
-                }}>
-                <View
-                  style={{
-                    position: 'absolute',
-                    right: 80,
-                  }}>
-                  <Checkbox
-                    status={iscredential ? 'checked' : 'unchecked'}
-                    onPress={() => {
-                      setIsCredential(!iscredential);
-                    }}
-                    color={Colors.primary}
-                    uncheckedColor={Colors.primary}
-                  />
-                </View>
-
-                <Text
-                  style={{
-                    fontSize: 16,
-                    fontFamily: 'Lato-Semibold',
-                    color: Colors.primary,
-                    position: 'absolute',
-                    right: 5,
-                  }}>
-                  Remember
-                </Text>
-              </View>
-
               <View style={{marginVertical: 16}} />
               <TouchableOpacity
                 onPress={() => {
                   handleForgetPassword(values);
-                  SetShowForgot(true);
-                }}>
+                  SetShowForgot(true)
+                }}
+                style={{}}>
                 <Text
                   style={{
+                    // textAlign: 'right',
                     fontSize: 16,
                     fontFamily: 'Lato-Semibold',
                     color: Colors.primary,

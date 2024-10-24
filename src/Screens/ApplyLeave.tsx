@@ -125,56 +125,59 @@ const ApplyLeave = () => {
       totalDaysofLeave: totalLeaveDay,
     };
 
-    try {
-    const response = await ApplyLeave({data, accessToken});
-      if (
-        response?.data?.messageDetail?.message ===
-        'Your leave application has been submitted successfully.'
-      ) {
-        Toast.show({
-          type: 'success',
-          text1: 'Leave Status',
-          text2: response?.data?.messageDetail?.message,
-          text2Style: {
-            flexWrap: 'wrap',
-            fontSize: 20,
-            fontFamily: 'Lato-Regular',
-          },
-          topOffset: 80,
-          visibilityTime: 5000,
-        });
+    console.log(data);
 
-        setTimeout(() => {
-          navigation.replace('LeaveRequest');
-        }, 5000);
-      } else {
-        Toast.show({
-          type: 'success',
-          text1: 'Leave Status',
-          text2: response?.data?.messageDetail?.message,
-          text2Style: {
-            flexWrap: 'wrap',
-            fontSize: 20,
-            fontFamily: 'Lato-Regular',
-          },
-          topOffset: 80,
-          visibilityTime: 5000,
-        });
-      }
-    } catch (err) {
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'Application failed. Please try again.',
-        text2Style: {
-          flexWrap: 'wrap',
-          fontSize: 20,
-          fontFamily: 'Lato-Regular',
-        },
-        topOffset: 80,
-        visibilityTime: 4000,
-      });
-    }
+    // try {
+    // const response = await ApplyLeave({data, accessToken});
+    //   console.log('dre',response);
+    //   if (
+    //     response?.data?.messageDetail?.message ===
+    //     'Your leave application has been submitted successfully.'
+    //   ) {
+    //     Toast.show({
+    //       type: 'success',
+    //       text1: 'Leave Status',
+    //       text2: response?.data?.messageDetail?.message,
+    //       text2Style: {
+    //         flexWrap: 'wrap',
+    //         fontSize: 20,
+    //         fontFamily: 'Lato-Regular',
+    //       },
+    //       topOffset: 80,
+    //       visibilityTime: 5000,
+    //     });
+
+    //     setTimeout(() => {
+    //       navigation.replace('LeaveRequest');
+    //     }, 5000);
+    //   } else {
+    //     Toast.show({
+    //       type: 'success',
+    //       text1: 'Leave Status',
+    //       text2: response?.data?.messageDetail?.message,
+    //       text2Style: {
+    //         flexWrap: 'wrap',
+    //         fontSize: 20,
+    //         fontFamily: 'Lato-Regular',
+    //       },
+    //       topOffset: 80,
+    //       visibilityTime: 5000,
+    //     });
+    //   }
+    // } catch (err) {
+    //   Toast.show({
+    //     type: 'error',
+    //     text1: 'Error',
+    //     text2: 'Application failed. Please try again.',
+    //     text2Style: {
+    //       flexWrap: 'wrap',
+    //       fontSize: 20,
+    //       fontFamily: 'Lato-Regular',
+    //     },
+    //     topOffset: 80,
+    //     visibilityTime: 4000,
+    //   });
+    // }
   };
 
   return (
@@ -583,24 +586,25 @@ const ApplyLeave = () => {
               }}
               disabled={isLoading ? true : false}
               onPress={() => {
-                Alert.alert(
-                  'Leave Status',
-                  'Are you sure you want to Apply the leave?',
-                  [
-                    {
-                      text: 'No',
-                      onPress: () => console.log('Cancel Pressed'),
-                      style: 'cancel',
-                    },
-                    {
-                      text: 'Yes',
-                      onPress: () => {
-                        handleApply(values);
-                      },
-                    },
-                  ],
-                  {cancelable: true},
-                );
+                handleApply(values);
+                // Alert.alert(
+                //   'Leave Status',
+                //   'Are you sure you want to Apply the leave?',
+                //   [
+                //     {
+                //       text: 'No',
+                //       onPress: () => console.log('Cancel Pressed'),
+                //       style: 'cancel',
+                //     },
+                //     {
+                //       text: 'Yes',
+                //       onPress: () => {
+                //         handleApply(values);
+                //       },
+                //     },
+                //   ],
+                //   {cancelable: true},
+                // );
               }}>
               {isLoading ? (
                 <ActivityIndicator

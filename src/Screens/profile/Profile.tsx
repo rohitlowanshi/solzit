@@ -1,7 +1,6 @@
 import {
   Alert,
   Image,
-  Linking,
   Modal,
   PermissionsAndroid,
   Platform,
@@ -20,7 +19,6 @@ import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {Colors} from '../../constants/Colors';
 import {useEmployeeUpdateProfileMutation} from '../../Services/appLevel';
 import Toast from 'react-native-toast-message';
-import {PERMISSION_TYPE, PermissionHandler} from '../../permissions';
 
 const Profile = () => {
   const navigation = useNavigation();
@@ -29,29 +27,41 @@ const Profile = () => {
   const Profiledata = EmployeeId?.userProfile;
   const base64Image = `data:image/jpeg;base64,${Profiledata?.employeeImg}`;
 
-  const [imageAsset, setImageAsset] = useState(null);
+  const [imageAsset, setImageAsset] = useState(null); 
   const [modalVisible, setModalVisible] = useState(false);
+  
 
-  const openModal = async () => {
-    const cameraPermission = await PermissionHandler.checkPermission(
-      PERMISSION_TYPE.camera,
-    );
-
-    const photosPermission = await PermissionHandler.checkPermission(
-      PERMISSION_TYPE.photos,
-    );
-
-    if (!cameraPermission || !photosPermission) {
-      Linking.openSettings();
-      return;
+  const requestPermissions = async () => {
+    if (Platform.OS === 'android') {
+      try {
+        const granted = await PermissionsAndroid.requestMultiple([
+          PermissionsAndroid.PERMISSIONS.CAMERA,
+          PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+        ]);
+        return (
+          granted['android.permission.CAMERA'] ===
+            PermissionsAndroid.RESULTS.GRANTED &&
+          granted['android.permission.READ_EXTERNAL_STORAGE'] ===
+            PermissionsAndroid.RESULTS.GRANTED
+        );
+      } catch (err) {
+        console.warn(err);
+        return false;
+      }
     }
-
-    if (cameraPermission && photosPermission) {
-      setModalVisible(true);
-    }
+    return true; 
   };
 
   const openImagePicker = async (type: string) => {
+    const hasPermission = await requestPermissions();
+    if (!hasPermission) {
+      Alert.alert(
+        'Permissions Required',
+        'Please grant the required permissions.',
+      );
+      return;
+    }
     const options = {
       includeBase64: true,
       mediaType: 'photo',
@@ -68,8 +78,9 @@ const Profile = () => {
         console.log('Image Picker Error: ', response.errorMessage);
       } else {
         const asset = response.assets[0];
-        setImageAsset(asset);
-        setModalVisible(false);
+        setImageAsset(asset); 
+        // console.log('Selected Asset:', asset);
+        setModalVisible(false); 
       }
     });
   };
@@ -80,23 +91,19 @@ const Profile = () => {
     try {
       const body = {
         email: Profiledata.email,
-        profileImage: imageAsset?.base64 || imageAsset.uri,
+        profileImage: imageAsset?.base64 || imageAsset.uri, 
       };
-
-      const response = await updateProfile(body);
-
+  
+      const response = await updateProfile(body); 
+      
       if (response?.data?.isSuccessful === true) {
         Toast.show({
           type: 'success',
           text1: 'Profile Update Status',
           text2: response?.data?.messageDetail?.message,
-          text2Style: {
-            flexWrap: 'wrap',
-            fontSize: 13,
-            fontFamily: 'Lato-Regular',
-          },
+          text2Style: { flexWrap: 'wrap', fontSize: 13,fontFamily:'Lato-Regular'},
           topOffset: 80,
-          visibilityTime: 7000,
+          visibilityTime: 7000, 
         });
       }
     } catch (error) {
@@ -106,7 +113,7 @@ const Profile = () => {
   };
 
   useEffect(() => {
-    if (imageAsset != null) {
+    if(imageAsset != null){
       handleUpdateImage();
     }
   }, [imageAsset]);
@@ -130,16 +137,16 @@ const Profile = () => {
       />
 
       <Card style={styles(isDark).cardcontainer}>
-        <IconButton
-          style={{position: 'absolute', top: -10, right: -5}}
-          icon="account-edit"
-          iconColor={Colors.primary}
-          size={30}
-          onPress={openModal}
-        />
+      <IconButton
+                style={{position:'absolute',top:-10,right:-5}}
+                icon="account-edit"
+                iconColor={Colors.primary}
+                size={30}
+                onPress={() => setModalVisible(true)}
+              />
         <TouchableOpacity
           style={{alignItems: 'center', marginBottom: 40}}
-          onPress={openModal}>
+          onPress={() => setModalVisible(true)}>
           {Profiledata?.employeeImg ? (
             <Image
               style={{
@@ -163,8 +170,8 @@ const Profile = () => {
                 left: 10,
               }}
               source={
-                imageAsset?.uri
-                  ? {uri: imageAsset.uri}
+                imageAsset?.uri 
+                  ? { uri: imageAsset.uri } 
                   : require('../../Assets/Images/profile.png')
               }
             />
