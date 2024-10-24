@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
+import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import RootStack from './RootStack';
 import AuthStack from './AuthStack';
-import { useColorScheme } from 'react-native';
-import { theme } from '../AppStore/Reducers/appState';
+import {useColorScheme} from 'react-native';
+import {theme} from '../AppStore/Reducers/appState';
+import {PermissionHandler} from '../permissions';
 
 const CheckStack = () => {
   const dispatch = useDispatch();
